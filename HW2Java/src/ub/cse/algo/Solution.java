@@ -50,8 +50,6 @@ public class Solution {
 		ArrayList<Integer> slots_list = new ArrayList<Integer>();
 
 		for (int i = 1; i <= m; i++) {
-//			System.out.printf("%d: ", i);
-//			System.out.println(hospitalList.get(i));
 			slots_list.add(hospitalList.get(i).getFirst());
 		}
 		return slots_list;
@@ -112,18 +110,71 @@ public class Solution {
      * @return Your stable matches
      */
 	public ArrayList<Match> getMatches() {
+		ArrayList<Integer> slots_list = GetSlotsList(_nHospital, _hospitalList);
+		int total_slots = 0;
+		for (int slot = 0; slot <slots_list.size(); slot++) {
+			total_slots += slots_list.get(slot);
+		}
+		int num_dummy_hospitals = (_nHospital - total_slots);
+
+		//
+		//System.out.println(slots_list);
+		//System.out.println(total_slots);
+		//
+
+		/**
+		 * Add mini hospitals
+		 * Clones of existing hospitals with identical preferences
+		 */
+		int hospital_padding = 0;
+		HashMap<Integer, ArrayList<Integer>> mini_hospital_list = new HashMap<>();
+		for (int h = 0; h < _nHospital; h++) {
+			int num_mini_h = slots_list.get(h);
+			for (int w = 0; w < num_mini_h; w++) {
+				mini_hospital_list.put(hospital_padding + w +1, _hospitalList.get(h+1));
+			}
+		hospital_padding += num_mini_h;
+		}
 
 
-//		ArrayList<Integer> slots_list = GetSlotsList(_nHospital, _hospitalList);
-//		System.out.println(slots_list);
+		//
+		HashMap<Integer, ArrayList<Integer>> padded_student_list = new HashMap<>();
+		for (int s = 0; s < _nStudent; s++) {
+			padded_student_list.put(s, _studentList.get(s));
+
+		}
 
 
 
-        // Returns an empty ArrayList for now
-		ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
-		return stable_match;
+
+
+
+		if (_nHospital != _nStudent) {
+			return new ArrayList<Match>();
+		}
+
+		//
+ 		return GaleShapley(_nHospital, _nStudent, mini_hospital_list, _studentList);
+		//
+
+
+//		ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
+//		return stable_match;
 
 
 //        return new ArrayList<Match>();
 	}
 }
+
+
+/**
+ * Sources:
+ * Algorithm Design K&T
+ * 		Chapter 1
+ * 		pg. 28 contains algorithm for Gale-Shapley
+ *
+ * Oracle Java Documentation:
+ * 		ArrayList
+ * 		HashMap
+ *
+ */
