@@ -64,13 +64,13 @@ public class Solution {
 		for (int i = 1; i <= m; i ++) {
 			unmatched_hospitals.add(i);
 		}
-		System.out.println(unmatched_hospitals);
-		int num_loop = 1;
+//		System.out.println(unmatched_hospitals);
+//		int num_loop = 1;
 		while (!unmatched_hospitals.isEmpty()) {
-			System.out.println("~~~~~~~``");
-			System.out.printf("Number loops: %d\n", num_loop);
-			System.out.println(unmatched_hospitals);
-			num_loop++;
+//			System.out.println("~~~~~~~``");
+//			System.out.printf("Number loops: %d\n", num_loop);
+//			System.out.println(unmatched_hospitals);
+//			num_loop++;
 			int proposing_hospital = unmatched_hospitals.getFirst();
 			boolean unmatched = true;
 			int j = 1;
@@ -100,7 +100,7 @@ public class Solution {
 					}
 				}
 			}
-			System.out.println(stable_matching_map);
+//			System.out.println(stable_matching_map);
 		}
 		for (int k = 1; k <= stable_matching_map.size(); k++) {
 			stable_matching_list.add(stable_matching_map.get(k));
@@ -123,8 +123,8 @@ public class Solution {
 		int num_dummy_hospitals = (_nStudent - total_slots);
 
 		//
-		System.out.println(slots_list);
-		System.out.println(total_slots);
+//		System.out.println(slots_list);
+//		System.out.println(total_slots);
 		//
 
 		/**
@@ -153,22 +153,24 @@ public class Solution {
 
 		//
  		//
-		System.out.printf("Number slots: %d\n", total_slots);
-		System.out.printf("Number hospitals: %d\n", _nHospital);
-		System.out.printf("Number dummy hospitals: %d\n", num_dummy_hospitals);
-		System.out.print("mini_list size: ");
-		System.out.println(mini_hospital_list.size());
-		System.out.println("~~~~~~~~~~~~~~");
-		for (int x = 1; x <= _nStudent; x++) {
-			System.out.printf("%d:   ", x);
-			System.out.println(mini_hospital_list.get(x));
-		}
+//		System.out.printf("Number slots: %d\n", total_slots);
+//		System.out.printf("Number hospitals: %d\n", _nHospital);
+//		System.out.printf("Number dummy hospitals: %d\n", num_dummy_hospitals);
+//		System.out.print("mini_list size: ");
+//		System.out.println(mini_hospital_list.size());
+//		System.out.println("~~~~~~~~~~~~~~");
+		//
+//		for (int x = 1; x <= _nStudent; x++) {
+//			System.out.printf("%d:   ", x);
+//			System.out.println(mini_hospital_list.get(x));
+//		}
+//
 //		System.out.println(mini_hospital_list);
-		System.out.println("~~~~~~~~~~~~~~");
-		System.out.printf("Number students: %d\n", _nStudent);
-		System.out.println(mini_hospital_list.get(1).size());
-		System.out.println("~~~~~~~~~~~~~~");
-		System.out.println("~~~~~~~~~~~~~~");
+//		System.out.println("~~~~~~~~~~~~~~");
+//		System.out.printf("Number students: %d\n", _nStudent);
+//		System.out.println(mini_hospital_list.get(1).size());
+//		System.out.println("~~~~~~~~~~~~~~");
+//		System.out.println("~~~~~~~~~~~~~~");
 		//
  		//
 
@@ -189,10 +191,11 @@ public class Solution {
 			}
 		}
 
-		System.out.println("~~~~~~~~~~~~~~~~~");
-		System.out.println(mini_hospital_codex);
-		System.out.println("~~~~~~~~~~~~~~~~~");
-
+		//
+//		System.out.println("~~~~~~~~~~~~~~~~~");
+//		System.out.println(mini_hospital_codex);
+//		System.out.println("~~~~~~~~~~~~~~~~~");
+		//
 
 		/**
 		 * Make student list into preference of jobs
@@ -212,33 +215,44 @@ public class Solution {
 			}
 			padded_student_list.put(s, padded_student_preference);
 		}
-//		System.out.println("~~~~~~~~~~~~~~~~~");
-////		System.out.println(_studentList.get(1).size());
-////		System.out.println(_studentList.get(1));
-//		System.out.println(padded_student_list);
-//		System.out.println("~~~~~~~~~~~~~~~~~");
+
+		/**
+		 * Post-Processing
+		 * Remove students who are matched to dummy hospitals.
+		 * Establish connection between mini-hospital and original
+		 */
 
 
-
-
-
-
-//
-//		if (_nHospital != _nStudent) {
-//			return new ArrayList<Match>();
-//		}
-
-
-		System.out.println(mini_hospital_list.size());
-		System.out.println(padded_student_list.size());
 		//
- 		return GaleShapley(mini_hospital_list.size(), _nStudent, mini_hospital_list, padded_student_list);
+		ArrayList<Match> stable_match_dummy = GaleShapley(mini_hospital_list.size(), _nStudent, mini_hospital_list, padded_student_list);
+//		System.out.printf("stable match size: %d", stable_match_dummy.size());
+//		System.out.println(stable_match_dummy);
+		ArrayList<Match> stable_match_final = new ArrayList<>();
+
+		for (int match = 0; match < stable_match_dummy.size(); match++) {
+//			System.out.println("~~~~~~~~~~~~~");
+//			System.out.println(stable_match_dummy.get(match).hospital);
+			int matched_hospital = stable_match_dummy.get(match).hospital;
+			if (matched_hospital <= total_slots) {
+				stable_match_final.add(stable_match_dummy.get(match));
+			}
+
+		}
+
+		for (int mini = 0; mini < stable_match_final.size(); mini++) {
+			int mini_hospital_num = stable_match_final.get(mini).hospital;
+
+			for (int h = 0; h < mini_hospital_codex.size(); h++) {
+				if (mini_hospital_codex.get(h).contains(mini_hospital_num)) {
+					stable_match_final.get(mini).hospital = h +1;
+				}
+			}
+		}
+
+		return stable_match_final;
+
+		// 		return GaleShapley(mini_hospital_list.size(), _nStudent, mini_hospital_list, padded_student_list);
 		//
-
-
-//		ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
-//		return stable_match;
-
 
 //        return new ArrayList<Match>();
 	}
