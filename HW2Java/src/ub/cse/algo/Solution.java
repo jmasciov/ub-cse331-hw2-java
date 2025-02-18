@@ -37,15 +37,93 @@ public class Solution {
 		_hospitalList = hospitalList;
 		_studentList = studentList;
 	}
-    
+
+	/*
+	 * My methods and classes
+	 */
+
+	/**
+	 * total_slots
+	 * return an array list of all hospitals and their open slots
+	 */
+	static ArrayList<Integer> GetSlotsList(int m, HashMap<Integer, ArrayList<Integer>> hospitalList) {
+		ArrayList<Integer> slots_list = new ArrayList<Integer>();
+
+		for (int i = 1; i <= m; i++) {
+//			System.out.printf("%d: ", i);
+//			System.out.println(hospitalList.get(i));
+			slots_list.add(hospitalList.get(i).getFirst());
+		}
+		return slots_list;
+	}
+
+	static ArrayList<Match> GaleShapley(int m, int n, HashMap<Integer, ArrayList<Integer>> hospitalList, HashMap<Integer, ArrayList<Integer>> studentList) {
+		ArrayList<Match> stable_matching_list = new ArrayList<Match>();
+		HashMap<Integer , Match> stable_matching_map = new HashMap<>();
+		ArrayList<Integer> unmatched_hospitals = new ArrayList<>();
+		ArrayList<Integer> matched_students = new ArrayList<>();
+
+		for (int i = 1; i <= m; i ++) {
+			unmatched_hospitals.add(i);
+		}
+		while (!unmatched_hospitals.isEmpty()) {
+			int proposing_hospital = unmatched_hospitals.getFirst();
+			System.out.printf("Proposing hospital: %d\n", proposing_hospital);
+			System.out.println(unmatched_hospitals);
+			for (int j = 1; j <= n; j++) {
+				int proposed_student = hospitalList.get(proposing_hospital).get(j);		// gets most preferred student in descending order
+				if (!matched_students.contains(proposed_student)) {						// student is unmatched
+					Match new_match = new Match(proposing_hospital, proposed_student);
+					stable_matching_map.put(proposed_student, new_match);
+					matched_students.add(proposed_student);
+					unmatched_hospitals.remove(Integer.valueOf(proposing_hospital));
+					j++;
+				} else {																// student is matched to hospital h'
+					Match existing_match = stable_matching_map.get(proposed_student);
+					int existing_hospital_match = existing_match.hospital;
+					int existing_hospital_rank = studentList.get(proposed_student).indexOf(existing_hospital_match - 1);
+					int proposing_hospital_rank = studentList.get(proposed_student).indexOf(proposing_hospital - 1);
+					if (existing_hospital_rank < proposing_hospital_rank) {				// student prefers current match over h'
+						j++;
+					} else {
+						stable_matching_map.remove(proposed_student);
+						Match new_match = new Match(proposing_hospital, proposed_student);
+						stable_matching_map.put(proposed_student, new_match);
+						unmatched_hospitals.add(existing_hospital_match);
+						unmatched_hospitals.remove(Integer.valueOf(proposing_hospital));
+					}
+				}
+			}
+			System.out.println(stable_matching_map);
+
+		}
+		for (int k = 1; k <= stable_matching_map.size(); k++) {
+			stable_matching_list.add(stable_matching_map.get(k));
+		}
+		System.out.println(stable_matching_map);
+		System.out.println(stable_matching_list);
+		return stable_matching_list;
+	}
+
+
     /**
      * This method must be filled in by you. You may add other methods and subclasses as you see fit,
      * but they must remain within the HW1_Student_Solution class.
      * @return Your stable matches
      */
 	public ArrayList<Match> getMatches() {
-        
+		
+
+		ArrayList<Integer> slots_list = GetSlotsList(_nHospital, _hospitalList);
+		System.out.println(slots_list);
+
+
+
         // Returns an empty ArrayList for now
+		//ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
+		//return stable_match;
+
+
         return new ArrayList<Match>();
 	}
 }
