@@ -64,12 +64,17 @@ public class Solution {
 		for (int i = 1; i <= m; i ++) {
 			unmatched_hospitals.add(i);
 		}
-//		System.out.println(unmatched_hospitals);
+		System.out.println(unmatched_hospitals);
+		int num_loop = 1;
 		while (!unmatched_hospitals.isEmpty()) {
+			System.out.println("~~~~~~~``");
+			System.out.printf("Number loops: %d\n", num_loop);
+			System.out.println(unmatched_hospitals);
+			num_loop++;
 			int proposing_hospital = unmatched_hospitals.getFirst();
 			boolean unmatched = true;
 			int j = 1;
-			while (unmatched && j<n) {
+			while (unmatched) {
 				int proposed_student = hospitalList.get(proposing_hospital).get(j);		// gets most preferred student in descending order
 				if (!matched_students.contains(proposed_student)) {						// student is unmatched
 					Match new_match = new Match(proposing_hospital, proposed_student);
@@ -95,7 +100,7 @@ public class Solution {
 					}
 				}
 			}
-//			System.out.println(stable_matching_map);
+			System.out.println(stable_matching_map);
 		}
 		for (int k = 1; k <= stable_matching_map.size(); k++) {
 			stable_matching_list.add(stable_matching_map.get(k));
@@ -115,11 +120,11 @@ public class Solution {
 		for (int slot = 0; slot <slots_list.size(); slot++) {
 			total_slots += slots_list.get(slot);
 		}
-		int num_dummy_hospitals = (_nHospital - total_slots);
+		int num_dummy_hospitals = (_nStudent - total_slots);
 
 		//
-		//System.out.println(slots_list);
-		//System.out.println(total_slots);
+		System.out.println(slots_list);
+		System.out.println(total_slots);
 		//
 
 		/**
@@ -137,24 +142,97 @@ public class Solution {
 		}
 
 
+
+		/**
+		 * Add dummy hospitals
+		 * NOTE: start of dummy == total_slots
+		 */
+		for (int d = 1; d<=num_dummy_hospitals; d++) {
+			mini_hospital_list.put(total_slots + d, _hospitalList.get(_nHospital));			// key for dummy and value are filler.
+		}
+
 		//
+ 		//
+		System.out.printf("Number slots: %d\n", total_slots);
+		System.out.printf("Number hospitals: %d\n", _nHospital);
+		System.out.printf("Number dummy hospitals: %d\n", num_dummy_hospitals);
+		System.out.print("mini_list size: ");
+		System.out.println(mini_hospital_list.size());
+		System.out.println("~~~~~~~~~~~~~~");
+		for (int x = 1; x <= _nStudent; x++) {
+			System.out.printf("%d:   ", x);
+			System.out.println(mini_hospital_list.get(x));
+		}
+//		System.out.println(mini_hospital_list);
+		System.out.println("~~~~~~~~~~~~~~");
+		System.out.printf("Number students: %d\n", _nStudent);
+		System.out.println(mini_hospital_list.get(1).size());
+		System.out.println("~~~~~~~~~~~~~~");
+		System.out.println("~~~~~~~~~~~~~~");
+		//
+ 		//
+
+		/**
+		 * mini-hospital codex
+		 * Store a correlation between original hospital numbers and mini-hospital numbers
+		 * index: original hospital number -1
+		 * value: list of all mini hospitals that align to original hospital
+		 */
+		ArrayList<ArrayList<Integer>> mini_hospital_codex = new ArrayList<>();
+		int codex_padding = 1;
+
+		for (int h = 0; h < slots_list.size(); h++) {
+			mini_hospital_codex.add(new ArrayList<>());
+			for (int w = 0; w < slots_list.get(h); w++) {
+				mini_hospital_codex.get(h).add(codex_padding);
+				codex_padding += 1;
+			}
+		}
+
+		System.out.println("~~~~~~~~~~~~~~~~~");
+		System.out.println(mini_hospital_codex);
+		System.out.println("~~~~~~~~~~~~~~~~~");
+
+
+		/**
+		 * Make student list into preference of jobs
+		 */
 		HashMap<Integer, ArrayList<Integer>> padded_student_list = new HashMap<>();
-		for (int s = 0; s < _nStudent; s++) {
-			padded_student_list.put(s, _studentList.get(s));
-
+		for (int s = 1; s<= _nStudent; s++) {
+			ArrayList<Integer> padded_student_preference = new ArrayList<>();
+			for (int h = 0; h < _studentList.get(s).size(); h++) {
+				int hospital_num = _studentList.get(s).get(h);
+				int num_slots = slots_list.get(hospital_num -1);
+				for (int j = 0; j < num_slots; j++) {
+					padded_student_preference.add(mini_hospital_codex.get(hospital_num -1).get(j));
+				}
+			}
+			for (int d = 0; d < num_dummy_hospitals; d++){
+				padded_student_preference.add(total_slots+d+1);
+			}
+			padded_student_list.put(s, padded_student_preference);
 		}
+//		System.out.println("~~~~~~~~~~~~~~~~~");
+////		System.out.println(_studentList.get(1).size());
+////		System.out.println(_studentList.get(1));
+//		System.out.println(padded_student_list);
+//		System.out.println("~~~~~~~~~~~~~~~~~");
 
 
 
 
 
 
-		if (_nHospital != _nStudent) {
-			return new ArrayList<Match>();
-		}
+//
+//		if (_nHospital != _nStudent) {
+//			return new ArrayList<Match>();
+//		}
 
+
+		System.out.println(mini_hospital_list.size());
+		System.out.println(padded_student_list.size());
 		//
- 		return GaleShapley(_nHospital, _nStudent, mini_hospital_list, _studentList);
+ 		return GaleShapley(mini_hospital_list.size(), _nStudent, mini_hospital_list, padded_student_list);
 		//
 
 
