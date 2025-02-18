@@ -66,11 +66,12 @@ public class Solution {
 		for (int i = 1; i <= m; i ++) {
 			unmatched_hospitals.add(i);
 		}
+//		System.out.println(unmatched_hospitals);
 		while (!unmatched_hospitals.isEmpty()) {
 			int proposing_hospital = unmatched_hospitals.getFirst();
-			System.out.printf("Proposing hospital: %d\n", proposing_hospital);
-			System.out.println(unmatched_hospitals);
-			for (int j = 1; j <= n; j++) {
+			boolean unmatched = true;
+			int j = 1;
+			while (unmatched && j<n) {
 				int proposed_student = hospitalList.get(proposing_hospital).get(j);		// gets most preferred student in descending order
 				if (!matched_students.contains(proposed_student)) {						// student is unmatched
 					Match new_match = new Match(proposing_hospital, proposed_student);
@@ -78,11 +79,12 @@ public class Solution {
 					matched_students.add(proposed_student);
 					unmatched_hospitals.remove(Integer.valueOf(proposing_hospital));
 					j++;
+					unmatched = false;
 				} else {																// student is matched to hospital h'
 					Match existing_match = stable_matching_map.get(proposed_student);
 					int existing_hospital_match = existing_match.hospital;
-					int existing_hospital_rank = studentList.get(proposed_student).indexOf(existing_hospital_match - 1);
-					int proposing_hospital_rank = studentList.get(proposed_student).indexOf(proposing_hospital - 1);
+					int existing_hospital_rank = studentList.get(proposed_student).indexOf(existing_hospital_match);
+					int proposing_hospital_rank = studentList.get(proposed_student).indexOf(proposing_hospital);
 					if (existing_hospital_rank < proposing_hospital_rank) {				// student prefers current match over h'
 						j++;
 					} else {
@@ -91,17 +93,15 @@ public class Solution {
 						stable_matching_map.put(proposed_student, new_match);
 						unmatched_hospitals.add(existing_hospital_match);
 						unmatched_hospitals.remove(Integer.valueOf(proposing_hospital));
+						unmatched = false;
 					}
 				}
 			}
-			System.out.println(stable_matching_map);
-
+//			System.out.println(stable_matching_map);
 		}
 		for (int k = 1; k <= stable_matching_map.size(); k++) {
 			stable_matching_list.add(stable_matching_map.get(k));
 		}
-		System.out.println(stable_matching_map);
-		System.out.println(stable_matching_list);
 		return stable_matching_list;
 	}
 
@@ -112,18 +112,18 @@ public class Solution {
      * @return Your stable matches
      */
 	public ArrayList<Match> getMatches() {
-		
 
-		ArrayList<Integer> slots_list = GetSlotsList(_nHospital, _hospitalList);
-		System.out.println(slots_list);
+
+//		ArrayList<Integer> slots_list = GetSlotsList(_nHospital, _hospitalList);
+//		System.out.println(slots_list);
 
 
 
         // Returns an empty ArrayList for now
-		//ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
-		//return stable_match;
+		ArrayList<Match> stable_match = GaleShapley(_nHospital, _nStudent, _hospitalList, _studentList);
+		return stable_match;
 
 
-        return new ArrayList<Match>();
+//        return new ArrayList<Match>();
 	}
 }
